@@ -24,7 +24,7 @@ from keras.utils import to_categorical
 from capsulelayers import CapsuleLayer, PrimaryCap, Length, Mask
 
 
-def CapsNet(input_shape, n_class, num_routing):
+def CapsNet(input_shape, n_class, num_routing, filters=256):
     """
     A Capsule Network on MNIST.
     :param input_shape: data shape, 3d, [width, height, channels]
@@ -35,7 +35,7 @@ def CapsNet(input_shape, n_class, num_routing):
     x = layers.Input(shape=input_shape)
 
     # Layer 1: Just a conventional Conv2D layer
-    conv1 = layers.Conv2D(filters=256, kernel_size=9, strides=1, padding='valid', activation='relu', name='conv1')(x)
+    conv1 = layers.Conv2D(filters=filters, kernel_size=9, strides=1, padding='valid', activation='relu', name='conv1')(x)
 
     # Layer 2: Conv2D layer with `squash` activation, then reshape to [None, num_capsule, dim_vector]
     primarycaps = PrimaryCap(conv1, dim_vector=8, n_channels=32, kernel_size=9, strides=2, padding='valid')
@@ -205,6 +205,7 @@ if __name__ == "__main__":
     parser.add_argument('--is_training', default=1, type=int)
     parser.add_argument('--weights', default=None)
     parser.add_argument('--lr', default=0.001, type=float)
+    parser.add_argument('--filters', default=256, type=int)
     args = parser.parse_args()
     print(args)
     if not os.path.exists(args.save_dir):
@@ -217,7 +218,8 @@ if __name__ == "__main__":
     # define model
     model = CapsNet(input_shape=[x_train.shape[1], x_train.shape[2], 1],
                     n_class=len(np.unique(np.argmax(y_train, 1))),
-                    num_routing=args.num_routing)
+                    num_routing=args.num_routing,
+                    filters=args.filters)
     model.summary()
     plot_model(model, to_file=args.save_dir+'/model.png', show_shapes=True)
 
