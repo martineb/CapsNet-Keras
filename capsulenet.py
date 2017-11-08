@@ -161,7 +161,7 @@ def load_mnist():
     return (x_train, y_train), (x_test, y_test)
 
 def load_mbh(subsample=True):
-    with open('mbh_data_images', 'rb') as f:
+    with open('mbh_data_images.pckl', 'rb') as f:
         x_train, y_train, x_test, y_test = pickle.load(f)
 
     if subsample:
