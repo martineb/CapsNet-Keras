@@ -177,8 +177,10 @@ def load_mbh(subsample=True):
         x_train = x_train[idx]
         y_train = y_train[idx]
 
-    x_train = x_train.reshape(-1, 28, 28, 1).astype('float32')
-    x_test = x_test.reshape(-1, 28, 28, 1).astype('float32')
+    shapex = x_train.shape[1]
+    shapey = x_train.shape[2]
+    x_train = x_train.reshape(-1, shapex, shapey, 1).astype('float32')
+    x_test = x_test.reshape(-1, shapex, shapey, 1).astype('float32')
     y_train = to_categorical(y_train.astype('float32'))
     y_test = to_categorical(y_test.astype('float32'))
     return (x_train, y_train), (x_test, y_test)
@@ -213,7 +215,7 @@ if __name__ == "__main__":
     (x_train, y_train), (x_test, y_test) = load_mbh()
 
     # define model
-    model = CapsNet(input_shape=[28, 28, 1],
+    model = CapsNet(input_shape=[x_train.shape[1], x_train.shape[2], 1],
                     n_class=len(np.unique(np.argmax(y_train, 1))),
                     num_routing=args.num_routing)
     model.summary()
