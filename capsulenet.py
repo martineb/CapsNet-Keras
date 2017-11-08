@@ -164,8 +164,8 @@ def load_mnist():
     y_test = to_categorical(y_test.astype('float32'))
     return (x_train, y_train), (x_test, y_test)
 
-def load_mbh(subsample=True):
-    with open('mbh_data_images.pckl', 'rb') as f:
+def load_mbh(file_path,subsample=True):
+    with open(file_path, 'rb') as f:
         x_train, y_train, x_test, y_test = pickle.load(f)
 
     if subsample:
@@ -206,6 +206,7 @@ if __name__ == "__main__":
     parser.add_argument('--weights', default=None)
     parser.add_argument('--lr', default=0.001, type=float)
     parser.add_argument('--filters', default=256, type=int)
+    parser.add_argument('--file_path', default='mbh_data_images.pckl', type=str)
     args = parser.parse_args()
     print(args)
     if not os.path.exists(args.save_dir):
@@ -213,7 +214,7 @@ if __name__ == "__main__":
 
     # load data
     # (x_train, y_train), (x_test, y_test) = load_mnist()
-    (x_train, y_train), (x_test, y_test) = load_mbh()
+    (x_train, y_train), (x_test, y_test) = load_mbh(args.file_path)
 
     # define model
     model = CapsNet(input_shape=[x_train.shape[1], x_train.shape[2], 1],
