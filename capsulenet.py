@@ -16,6 +16,8 @@ Result:
 Author: Xifeng Guo, E-mail: `guoxifeng1990@163.com`, Github: `https://github.com/XifengGuo/CapsNet-Keras`
 """
 
+import pickle
+
 from keras import layers, models, optimizers
 from keras import backend as K
 from keras.utils import to_categorical
@@ -158,6 +160,24 @@ def load_mnist():
     y_test = to_categorical(y_test.astype('float32'))
     return (x_train, y_train), (x_test, y_test)
 
+def load_mbh(subsample=True):
+    with open('mbh_data_images', 'rb') as f:
+        x_train, y_train, x_test, y_test = pickle.load(f)
+
+    if subsample:
+        idx_0 = np.where(y_train == 0)[0]
+        idx_not0 = np.where(y_train != 0)[0]
+        idx_0 = np.random.choice(idx_0, size=idx_not0.shape[0], replace=False)
+        idx = np.append(idx_0, idx_not0)
+        np.random.shuffle(idx)
+        x_train = x_train[idx]
+        y_train = y_train[idx]
+
+    x_train = x_train.reshape(-1, 28, 28, 1).astype('float32')
+    x_test = x_test.reshape(-1, 28, 28, 1).astype('float32')
+    y_train = to_categorical(y_train.astype('float32'))
+    y_test = to_categorical(y_test.astype('float32'))
+    return (x_train, y_train), (x_test, y_test)
 
 if __name__ == "__main__":
     import numpy as np
@@ -185,7 +205,8 @@ if __name__ == "__main__":
         os.makedirs(args.save_dir)
 
     # load data
-    (x_train, y_train), (x_test, y_test) = load_mnist()
+    # (x_train, y_train), (x_test, y_test) = load_mnist()
+    (x_train, y_train), (x_test, y_test) = load_mbh()
 
     # define model
     model = CapsNet(input_shape=[28, 28, 1],
